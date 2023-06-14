@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class UserTest extends TestCase
@@ -49,8 +50,8 @@ class UserTest extends TestCase
         $response = $this->post('/api/auth/register', $payload);
 
         $response->assertStatus(422)
-            ->assertJsonPath('message', "Failed Validation")
-            ->assertJsonPath('errors.password.0', "The password confirmation does not match.");
+            ->assertJsonPath('error', "Failed Validation")
+            ->assertJsonPath('errors.password.0', "The password field confirmation does not match.");
 
         $this->assertDatabaseMissing('users', [
             "email" => $payload['email']
@@ -67,8 +68,8 @@ class UserTest extends TestCase
         $response = $this->post('/api/auth/register', $payload);
 
         $response->assertStatus(422)
-            ->assertJsonPath('message', "Failed Validation")
-            ->assertJsonPath('errors.email.0', "The email must be a valid email address.");
+            ->assertJsonPath('error', "Failed Validation")
+            ->assertJsonPath('errors.email.0', "The email field must be a valid email address.");
 
         $this->assertDatabaseMissing('users', [
             "email" => $payload['email']
@@ -93,12 +94,10 @@ class UserTest extends TestCase
         $response = $this->post('/api/auth/register', $payload);
 
         $response->assertStatus(422)
-            ->assertJsonPath('message', "Failed Validation")
+            ->assertJsonPath('error', "Failed Validation")
             ->assertJsonPath('errors.email.0', "The email has already been taken.");
 
-        $this->assertDatabaseMissing('users', [
-            "email" => $payload['email']
-        ]);
+        $this->assertDatabaseCount('users', 1);
     }
 
     public function test_user_login(): void {
@@ -128,6 +127,6 @@ class UserTest extends TestCase
         $response = $this->post('/api/auth/login', $payload);
 
         $response->assertStatus(422)
-            ->assertJsonPath('message', "Incorrect Credentials");
+            ->assertJsonPath('error', "Incorrect Credentials");
     }
 }

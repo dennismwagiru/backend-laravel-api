@@ -1,0 +1,100 @@
+<?php
+
+namespace Tests\Feature;
+
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithFaker;
+use Tests\TestCase;
+
+class UserTest extends TestCase
+{
+    /**
+     * A basic feature test example.
+     */
+    public function test_user_register(): void
+    {
+        $payload = [
+            'name' => 'John Doe',
+            'email' => 'john.doe@barnacle.com',
+            'password' => 'Test@1234!',
+            'password_confirmation' => 'Test@1234!'
+        ];
+        $response = $this->post('/api/auth/register', $payload);
+
+        $response->assertStatus(201)
+            ->assertJsonStructure([
+                'id',
+                'name',
+                'email',
+                'created_at'
+            ])
+            ->assertJsonPath('name', $payload['name'])
+            ->assertJsonPath('email', $payload['email'])
+            ->assertJsonMissingPath('data.password');
+
+        $this->assertDatabaseHas('users', [
+            "email" => $payload['email']
+        ]);
+    }
+
+    public function test_user_register_password_confirmation(): void
+    {
+        $payload = [
+            'name' => 'John Doe',
+            'email' => 'john.doe@barnacle.com',
+            'password' => 'Test@1234!',
+            'password_confirmation' => '1234!'
+        ];
+        $response = $this->post('/api/auth/register', $payload);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', "Failed Validation")
+            ->assertJsonPath('errors.password.0', "The password confirmation does not match.");
+
+        $this->assertDatabaseMissing('users', [
+            "email" => $payload['email']
+        ]);
+    }
+
+    public function test_user_register_email_format(): void {
+        $payload = [
+            'name' => 'John Doe',
+            'email' => 'john.doebarnacle.com',
+            'password' => 'Test@1234!',
+            'password_confirmation' => 'Test@1234!'
+        ];
+        $response = $this->post('/api/auth/register', $payload);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', "Failed Validation")
+            ->assertJsonPath('errors.email.0', "The email must be a valid email address.");
+
+        $this->assertDatabaseMissing('users', [
+            "email" => $payload['email']
+        ]);
+    }
+
+    public function test_user_login(): void {
+        $payload = [
+            'email' => 'john.doe@barnacle.com',
+            'password' => 'Test@1234!',
+        ];
+        $response = $this->post('/api/auth/login', $payload);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'token',
+            ]);
+    }
+
+    public function test_user_login_invalid_credentials(): void {
+        $payload = [
+            'email' => 'john.doe@barnacle.com',
+            'password' => '234!',
+        ];
+        $response = $this->post('/api/auth/login', $payload);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', "Incorrect Credentials");
+    }
+}

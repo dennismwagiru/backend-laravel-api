@@ -126,7 +126,7 @@ class UserTest extends TestCase
         ];
         $response = $this->post('/api/auth/login', $payload);
 
-        $response->assertStatus(422)
+        $response->assertStatus(401)
             ->assertJsonPath('error', "Incorrect Credentials");
     }
 }

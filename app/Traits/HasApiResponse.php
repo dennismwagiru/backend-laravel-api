@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as Response;
@@ -12,12 +13,10 @@ trait HasApiResponse
 
     public function parseGivenData(array $data = [], int $statusCode = Response::HTTP_OK, array $headers = []): array
     {
-        $responseStructure = [
-            'success' => $data['success'] ?? false,
-        ];
+        $responseStructure = [];
 
         if (isset($data['data'])) {
-            $responseStructure['data'] = $data['data'];
+            $responseStructure = $data['data'];
         }
 
         if (isset($data['error'])) {
@@ -53,9 +52,12 @@ trait HasApiResponse
         ]);
     }
 
-    protected function respondCreated($data): JsonResponse
+    protected function respondCreated(array $data): JsonResponse
     {
-        return $this->apiResponse($data, Response::HTTP_CREATED);
+        return $this->apiResponse([
+            'success' => true,
+            'data' => $data
+        ], Response::HTTP_CREATED);
     }
 
     protected function respondError(?string $error, int $statusCode = Response::HTTP_BAD_REQUEST, array $errors = null, array $trace = null): JsonResponse

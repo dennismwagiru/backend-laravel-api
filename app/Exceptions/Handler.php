@@ -58,28 +58,30 @@ class Handler extends ExceptionHandler
 
             if ($e instanceof ThrottleRequestsException) {
                 return $this->respondError(
-                    error: 'Too Many Requests,Please Slow Down',
+                    error: $e->getMessage(),
                     statusCode: 429,
                 );
             }
 
             if ($e instanceof ModelNotFoundException) {
                 return $this->respondError(
-                    error: str_replace('App\\Models\\', '', $e->getModel()) . ' not found',
+                    error: __('errors.not-found', [
+                        'attribute' => str_replace('App\\Models\\', '', $e->getModel())
+                    ]),
                     statusCode: 404,
                 );
             }
 
             if ($e instanceof ValidationException) {
                 return $this->respondError(
-                    error: "Failed Validation",
+                    error: __('errors.validation'),
                     statusCode: ResponseAlias::HTTP_UNPROCESSABLE_ENTITY,
                     errors: $e->errors(),
                 );
             }
             if ($e instanceof QueryException) {
                 return $this->respondError(
-                    error: 'There was issue with the Query',
+                    error: __('errors.query'),
                     statusCode: ResponseAlias::HTTP_INTERNAL_SERVER_ERROR,
                     trace: $this->parseException($e)
                 );
@@ -92,7 +94,7 @@ class Handler extends ExceptionHandler
             }
 
             return $this->respondError(
-                error: "Unexpected Exception. Try later",
+                error: __('errors.server'),
                 statusCode: ResponseAlias::HTTP_INTERNAL_SERVER_ERROR,
                 trace: $this->parseException($e)
             );

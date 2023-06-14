@@ -47,6 +47,14 @@ class AuthController extends Controller
             );
         }
 
-        return $this->respondError("Incorrect Credentials", statusCode: Response::HTTP_UNAUTHORIZED);
+        return $this->respondError(__('auth.failed'), statusCode: Response::HTTP_UNAUTHORIZED);
+    }
+
+    public function forgotPassword(Request $request) {
+        $request->validate([
+            'email' => 'required|exists:users,email'
+        ]);
+
+        return $this->respondSuccess();
     }
 }

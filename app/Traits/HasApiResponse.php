@@ -65,7 +65,7 @@ trait HasApiResponse
         return $this->apiResponse(
             [
                 'success' => false,
-                'error' => $error ?? 'There was an internal error, Please try again later',
+                'error' => $error ?? __('errors.server'),
                 'errors' => $errors,
                 'trace' => $trace
             ],

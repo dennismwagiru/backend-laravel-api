@@ -14,6 +14,7 @@ class UserAuthTest extends TestCase
 
     const ROUTE_REGISTER = 'auth.register';
     const ROUTE_LOGIN = 'auth.login';
+    const ROUTE_FORGOT_PASSWORD = 'auth.forgot-password';
     const USER_ORIGINAL_PASSWORD = 'Test@1234!';
 
     /**
@@ -56,8 +57,10 @@ class UserAuthTest extends TestCase
         $response = $this->post(route(self::ROUTE_REGISTER), $payload);
 
         $response->assertStatus(422)
-            ->assertJsonPath('error', "Failed Validation")
-            ->assertJsonPath('errors.password.0', "The password field confirmation does not match.");
+            ->assertJsonPath('error', __('errors.validation'))
+            ->assertJsonPath('errors.password.0', __('validation.confirmed', [
+                'attribute' => 'password'
+            ]));
 
         $this->assertDatabaseMissing('users', [
             "email" => $payload['email']
@@ -74,8 +77,10 @@ class UserAuthTest extends TestCase
         $response = $this->post(route(self::ROUTE_REGISTER), $payload);
 
         $response->assertStatus(422)
-            ->assertJsonPath('error', "Failed Validation")
-            ->assertJsonPath('errors.email.0', "The email field must be a valid email address.");
+            ->assertJsonPath('error', __('errors.validation'))
+            ->assertJsonPath('errors.email.0', __('validation.email', [
+                'attribute' => 'email'
+            ]));
 
         $this->assertDatabaseMissing('users', [
             "email" => $payload['email']
@@ -100,8 +105,10 @@ class UserAuthTest extends TestCase
         $response = $this->post(route(self::ROUTE_REGISTER), $payload);
 
         $response->assertStatus(422)
-            ->assertJsonPath('error', "Failed Validation")
-            ->assertJsonPath('errors.email.0', "The email has already been taken.");
+            ->assertJsonPath('error', __('errors.validation'))
+            ->assertJsonPath('errors.email.0', __('validation.unique', [
+                'attribute' => 'email'
+            ]));
 
         $this->assertDatabaseCount('users', 1);
     }
@@ -133,6 +140,6 @@ class UserAuthTest extends TestCase
         $response = $this->post(route(self::ROUTE_LOGIN), $payload);
 
         $response->assertStatus(401)
-            ->assertJsonPath('error', "Incorrect Credentials");
+            ->assertJsonPath('error', __('auth.failed'));
     }
 }

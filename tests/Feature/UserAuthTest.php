@@ -2,18 +2,18 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
-class UserTest extends TestCase
+class UserAuthTest extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseTransactions;
+
     /**
      * A basic feature test example.
      */
-    public function test_user_register(): void
+    public function test_user_auth_register(): void
     {
         $payload = [
             'name' => 'John Doe',
@@ -39,7 +39,7 @@ class UserTest extends TestCase
         ]);
     }
 
-    public function test_user_register_password_confirmation(): void
+    public function test_user_auth_register_password_confirmation(): void
     {
         $payload = [
             'name' => 'John Doe',
@@ -58,7 +58,7 @@ class UserTest extends TestCase
         ]);
     }
 
-    public function test_user_register_email_format(): void {
+    public function test_user_auth_register_email_format(): void {
         $payload = [
             'name' => 'John Doe',
             'email' => 'john.doebarnacle.com',
@@ -76,7 +76,7 @@ class UserTest extends TestCase
         ]);
     }
 
-    public function test_user_register_duplicate_email(): void
+    public function test_user_auth_register_duplicate_email(): void
     {
         $payload = [
             'name' => 'John Doe',
@@ -100,7 +100,7 @@ class UserTest extends TestCase
         $this->assertDatabaseCount('users', 1);
     }
 
-    public function test_user_login(): void {
+    public function test_user_auth_login(): void {
         $payload = [
             'email' => 'john.doe@barnacle.com',
             'password' => 'Test@1234!',
@@ -119,7 +119,7 @@ class UserTest extends TestCase
             ]);
     }
 
-    public function test_user_login_invalid_credentials(): void {
+    public function test_user_auth_login_invalid_credentials(): void {
         $payload = [
             'email' => 'john.doe@barnacle.com',
             'password' => '234!',

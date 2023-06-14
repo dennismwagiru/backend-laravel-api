@@ -2,12 +2,13 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class UserTest extends TestCase
 {
+    use DatabaseMigrations;
     /**
      * A basic feature test example.
      */
@@ -74,11 +75,43 @@ class UserTest extends TestCase
         ]);
     }
 
+    public function test_user_register_duplicate_email(): void
+    {
+        $payload = [
+            'name' => 'John Doe',
+            'email' => 'john.doe@barnacle.com',
+            'password' => 'Test@1234!',
+            'password_confirmation' => 'Test@1234!'
+        ];
+
+        DB::table('users')->insert(array(
+            'name' => $payload['name'],
+            'email' => $payload['email'],
+            'password' => bcrypt($payload['password']),
+        ));
+
+        $response = $this->post('/api/auth/register', $payload);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('message', "Failed Validation")
+            ->assertJsonPath('errors.email.0', "The email has already been taken.");
+
+        $this->assertDatabaseMissing('users', [
+            "email" => $payload['email']
+        ]);
+    }
+
     public function test_user_login(): void {
         $payload = [
             'email' => 'john.doe@barnacle.com',
             'password' => 'Test@1234!',
         ];
+        DB::table('users')->insert(array(
+            'name' => 'John Doe',
+            'email' => $payload['email'],
+            'password' => bcrypt($payload['password']),
+        ));
+
         $response = $this->post('/api/auth/login', $payload);
 
         $response->assertStatus(200)

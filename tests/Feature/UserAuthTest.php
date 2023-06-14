@@ -3,12 +3,18 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class UserAuthTest extends TestCase
 {
     use DatabaseTransactions;
+    use WithFaker;
+
+    const ROUTE_REGISTER = 'auth.register';
+    const ROUTE_LOGIN = 'auth.login';
+    const USER_ORIGINAL_PASSWORD = 'Test@1234!';
 
     /**
      * A basic feature test example.
@@ -16,12 +22,12 @@ class UserAuthTest extends TestCase
     public function test_user_auth_register(): void
     {
         $payload = [
-            'name' => 'John Doe',
-            'email' => 'john.doe@barnacle.com',
-            'password' => 'Test@1234!',
-            'password_confirmation' => 'Test@1234!'
+            'name' => $this->faker->name,
+            'email' => $this->faker->unique()->email,
+            'password' => self::USER_ORIGINAL_PASSWORD,
+            'password_confirmation' => self::USER_ORIGINAL_PASSWORD
         ];
-        $response = $this->post('/api/auth/register', $payload);
+        $response = $this->post(route(self::ROUTE_REGISTER), $payload);
 
         $response->assertStatus(201)
             ->assertJsonStructure([
@@ -42,12 +48,12 @@ class UserAuthTest extends TestCase
     public function test_user_auth_register_password_confirmation(): void
     {
         $payload = [
-            'name' => 'John Doe',
-            'email' => 'john.doe@barnacle.com',
-            'password' => 'Test@1234!',
-            'password_confirmation' => '1234!'
+            'name' => $this->faker->name,
+            'email' => $this->faker->unique()->email,
+            'password' => self::USER_ORIGINAL_PASSWORD,
+            'password_confirmation' => $this->faker->password
         ];
-        $response = $this->post('/api/auth/register', $payload);
+        $response = $this->post(route(self::ROUTE_REGISTER), $payload);
 
         $response->assertStatus(422)
             ->assertJsonPath('error', "Failed Validation")
@@ -60,12 +66,12 @@ class UserAuthTest extends TestCase
 
     public function test_user_auth_register_email_format(): void {
         $payload = [
-            'name' => 'John Doe',
-            'email' => 'john.doebarnacle.com',
-            'password' => 'Test@1234!',
-            'password_confirmation' => 'Test@1234!'
+            'name' => $this->faker->name,
+            'email' => $this->faker->name,
+            'password' => self::USER_ORIGINAL_PASSWORD,
+            'password_confirmation' => self::USER_ORIGINAL_PASSWORD
         ];
-        $response = $this->post('/api/auth/register', $payload);
+        $response = $this->post(route(self::ROUTE_REGISTER), $payload);
 
         $response->assertStatus(422)
             ->assertJsonPath('error', "Failed Validation")
@@ -79,10 +85,10 @@ class UserAuthTest extends TestCase
     public function test_user_auth_register_duplicate_email(): void
     {
         $payload = [
-            'name' => 'John Doe',
-            'email' => 'john.doe@barnacle.com',
-            'password' => 'Test@1234!',
-            'password_confirmation' => 'Test@1234!'
+            'name' => $this->faker->name,
+            'email' => $this->faker->unique()->email,
+            'password' => self::USER_ORIGINAL_PASSWORD,
+            'password_confirmation' => self::USER_ORIGINAL_PASSWORD
         ];
 
         DB::table('users')->insert(array(
@@ -91,7 +97,7 @@ class UserAuthTest extends TestCase
             'password' => bcrypt($payload['password']),
         ));
 
-        $response = $this->post('/api/auth/register', $payload);
+        $response = $this->post(route(self::ROUTE_REGISTER), $payload);
 
         $response->assertStatus(422)
             ->assertJsonPath('error', "Failed Validation")
@@ -102,16 +108,16 @@ class UserAuthTest extends TestCase
 
     public function test_user_auth_login(): void {
         $payload = [
-            'email' => 'john.doe@barnacle.com',
-            'password' => 'Test@1234!',
+            'email' => $this->faker->unique()->email,
+            'password' => self::USER_ORIGINAL_PASSWORD,
         ];
         DB::table('users')->insert(array(
-            'name' => 'John Doe',
+            'name' => $this->faker->name,
             'email' => $payload['email'],
             'password' => bcrypt($payload['password']),
         ));
 
-        $response = $this->post('/api/auth/login', $payload);
+        $response = $this->post(route(self::ROUTE_LOGIN), $payload);
 
         $response->assertStatus(200)
             ->assertJsonStructure([
@@ -121,10 +127,10 @@ class UserAuthTest extends TestCase
 
     public function test_user_auth_login_invalid_credentials(): void {
         $payload = [
-            'email' => 'john.doe@barnacle.com',
-            'password' => '234!',
+            'email' => $this->faker->unique()->email,
+            'password' => $this->faker->name,
         ];
-        $response = $this->post('/api/auth/login', $payload);
+        $response = $this->post(route(self::ROUTE_LOGIN), $payload);
 
         $response->assertStatus(401)
             ->assertJsonPath('error', "Incorrect Credentials");

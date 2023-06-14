@@ -17,6 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -92,6 +93,12 @@ class Handler extends ExceptionHandler
                     statusCode: ResponseAlias::HTTP_NOT_FOUND
                 );
             }
+            if ($e instanceof TransportException) {
+                return $this->respondError(
+                    error: __('errors.email-server'),
+                    statusCode: ResponseAlias::HTTP_INTERNAL_SERVER_ERROR
+                );
+            }
 
             return $this->respondError(
                 error: __('errors.server'),
@@ -104,13 +111,14 @@ class Handler extends ExceptionHandler
     }
 
     protected function parseException($exception): array {
+
         if (config('app.env') !== 'production') {
             return [
                 'message' => $exception->getMessage(),
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'code' => $exception->getCode(),
-                'trace' => $exception->getTrace(),
+                'trace' => $exception?->getTrace(),
             ];
         }
 

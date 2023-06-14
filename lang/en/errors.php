@@ -6,4 +6,5 @@ return [
     'validation' => 'Failed Validation',
     'query' => 'There was issue with the Query',
     'not-found' => ':attribute not found',
+    'email-server' => 'Unable to send email. Check your mail configuration'
 ];

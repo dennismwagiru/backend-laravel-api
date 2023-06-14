@@ -46,6 +46,7 @@ trait HasApiResponse
 
     public function respondSuccess(array $data = []): JsonResponse
     {
+        \Log::info($data);
         return $this->apiResponse([
             'success' => true,
             'data' => $data

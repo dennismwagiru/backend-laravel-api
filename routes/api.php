@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,5 +32,6 @@ Route::prefix('auth')->name('auth.')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('authors', AuthorController::class)->only(['index', 'show']);
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
 });

@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,4 +28,8 @@ Route::prefix('auth')->name('auth.')->group(function () {
         Route::post('forgot', [AuthController::class, 'forgotPassword'])->name('forgot');
         Route::post('reset', [AuthController::class, 'resetPassword'])->name('reset');
     });
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
 });

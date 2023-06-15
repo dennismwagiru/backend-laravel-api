@@ -17,7 +17,7 @@ class AuthorController extends Controller
      */
     public function index(): JsonResponse
     {
-        $authors = Author::query()
+        $authors = Author::filterBy(request()->all())
             ->paginate(request('per_page', config('settings.per_page')));
 
         $data = fractal($authors, new AuthorTransformer())

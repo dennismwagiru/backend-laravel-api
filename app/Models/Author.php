@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Domain\Filter\FilterBuilder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,4 +35,15 @@ class Author extends Model
         'source', 'name', 'description'
     ];
 
+    /**
+     * @param Builder<Author> $query
+     * @param array<string, string> $filters
+     * @return Builder<Author>
+     */
+    public function scopeFilterBy(Builder $query, array $filters): Builder
+    {
+        $filter = new FilterBuilder($query, $filters, 'App\Models\Filters\Author');
+
+        return $filter->apply();
+    }
 }

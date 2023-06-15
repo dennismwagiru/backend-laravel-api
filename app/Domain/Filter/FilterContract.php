@@ -4,5 +4,9 @@ namespace App\Domain\Filter;
 
 interface FilterContract
 {
-    public function handle(string|bool|int $value): void;
+    /**
+     * @param string|bool|int|array $value
+     * @return void
+     */
+    public function handle(string|bool|int|array $value): void;
 }

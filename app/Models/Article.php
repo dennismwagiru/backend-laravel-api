@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Domain\Filter\FilterBuilder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -63,5 +65,17 @@ class Article extends Model
         return $this->belongsToMany(Category::class, 'article_categories',
             'article_id', 'category_id'
         );
+    }
+
+    /**
+     * @param Builder<Article> $query
+     * @param array<string, string> $filters
+     * @return Builder<Article>
+     */
+    public function scopeFilterBy(Builder $query, array $filters): Builder
+    {
+        $filter = new FilterBuilder($query, $filters, 'App\Models\Filters\Article');
+
+        return $filter->apply();
     }
 }

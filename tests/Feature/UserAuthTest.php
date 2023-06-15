@@ -24,7 +24,9 @@ class UserAuthTest extends TestCase
     const USER_ORIGINAL_PASSWORD = 'Test@1234!';
 
     /**
-     * A basic feature test example.
+     * Test Successful User Registration
+     *
+     * @return void
      */
     public function test_user_auth_register(): void
     {
@@ -52,6 +54,10 @@ class UserAuthTest extends TestCase
         ]);
     }
 
+    /**
+     * Test User Registration with Mismatching Passwords
+     * @return void
+     */
     public function test_user_auth_register_password_confirmation(): void
     {
         $payload = [
@@ -73,6 +79,10 @@ class UserAuthTest extends TestCase
         ]);
     }
 
+    /**
+     * Test User Registration with Invalid Email Format
+     * @return void
+     */
     public function test_user_auth_register_email_format(): void {
         $payload = [
             'name' => $this->faker->name,
@@ -93,6 +103,11 @@ class UserAuthTest extends TestCase
         ]);
     }
 
+    /**
+     * Test User Registration with a Duplicate Email Address
+     *
+     * @return void
+     */
     public function test_user_auth_register_duplicate_email(): void
     {
         $user = User::factory()->create();
@@ -113,6 +128,11 @@ class UserAuthTest extends TestCase
         $this->assertDatabaseCount('users', 1);
     }
 
+    /**
+     * Test Successful User Login
+     *
+     * @return void
+     */
     public function test_user_auth_login(): void {
         $user = User::factory()->create(
             ['password' => bcrypt(self::USER_ORIGINAL_PASSWORD)]
@@ -129,6 +149,11 @@ class UserAuthTest extends TestCase
             ]);
     }
 
+    /**
+     * Test User Login with Invalid Credentials
+     *
+     * @return void
+     */
     public function test_user_auth_login_invalid_credentials(): void {
         $response = $this->post(route(self::ROUTE_LOGIN), [
             'email' => $this->faker->unique()->safeEmail,
@@ -139,7 +164,11 @@ class UserAuthTest extends TestCase
             ->assertJsonPath('error', __('auth.failed'));
     }
 
-
+    /**
+     * Test Forgot Password Using an Invalid Email
+     *
+     * @return void
+     */
     public function test_user_auth_forgot_password_invalid_email(): void
     {
         $payload = [
@@ -155,6 +184,11 @@ class UserAuthTest extends TestCase
 
     }
 
+    /**
+     * Test Forgot Password Using a Non-Existent Email Address
+     *
+     * @return void
+     */
     public function test_user_auth_forgot_password_email_not_found(): void
     {
         $payload = [
@@ -170,6 +204,9 @@ class UserAuthTest extends TestCase
     }
 
     /**
+     * Test Successful Forgot Password
+     *
+     * @return void
      * @throws Exception
      */
     public function test_user_auth_forgot_password(): void
@@ -187,6 +224,11 @@ class UserAuthTest extends TestCase
         Notification::assertSentTo($user, ResetPassword::class);
     }
 
+    /**
+     * Test Reset Password Using an Invalid Email Address
+     *
+     * @return void
+     */
     public function test_user_auth_reset_password_invalid_email(): void
     {
         $user = User::factory()->create([
@@ -218,6 +260,11 @@ class UserAuthTest extends TestCase
             $user->password));
     }
 
+    /**
+     * Test Reset Password with a Non-Existent Email Address
+     *
+     * @return void
+     */
     public function test_user_auth_reset_password_email_not_found(): void
     {
         $user = User::factory()->create([
@@ -249,6 +296,11 @@ class UserAuthTest extends TestCase
             $user->password));
     }
 
+    /**
+     * Test Reset Password with Mismatching Passwords
+     *
+     * @return void
+     */
     public function test_user_auth_reset_password_password_mismatch(): void
     {
         $user = User::factory()->create([
@@ -281,6 +333,11 @@ class UserAuthTest extends TestCase
             $user->password));
     }
 
+    /**
+     * Test Reset Password with an Invalid Token
+     *
+     * @return void
+     */
     public function test_user_auth_reset_password_invalid_token(): void
     {
         $user = User::factory()->create([
@@ -311,6 +368,9 @@ class UserAuthTest extends TestCase
     }
 
     /**
+     * Test Successful Password Reset
+     *
+     * @return void
      * @throws Exception
      */
     public function test_user_auth_reset_password(): void

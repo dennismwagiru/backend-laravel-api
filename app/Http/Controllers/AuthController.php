@@ -8,10 +8,8 @@ use App\Traits\HasApiResponse;
 use App\Transformers\UserTransformer;
 use Auth;
 use Hash;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +18,12 @@ class AuthController extends Controller
 {
     use HasApiResponse;
 
+    /**
+     * Handle New User Registration
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function register(Request $request): JsonResponse
     {
         $request->validate([
@@ -37,6 +41,12 @@ class AuthController extends Controller
         );
     }
 
+    /**
+     * Handle User Login
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function login(Request $request): JsonResponse
     {
         $request->validate([
@@ -56,6 +66,12 @@ class AuthController extends Controller
         return $this->respondError(__('auth.failed'), statusCode: Response::HTTP_UNAUTHORIZED);
     }
 
+    /**
+     * Handle Forgot Password
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function forgotPassword(Request $request): JsonResponse
     {
         $request->validate([
@@ -75,6 +91,12 @@ class AuthController extends Controller
         );
     }
 
+    /**
+     * Handle Reset Password
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function resetPassword(Request $request): JsonResponse
     {
         $request->validate([

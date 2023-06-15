@@ -2,15 +2,20 @@
 
 namespace App\Traits;
 
-use Exception;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as Response;
 
 trait HasApiResponse
 {
 
+    /**
+     * Parse given data to return appropriate response where keys are set
+     *
+     * @param array $data
+     * @param int $statusCode
+     * @param array $headers
+     * @return array
+     */
     public function parseGivenData(array $data = [], int $statusCode = Response::HTTP_OK, array $headers = []): array
     {
         $responseStructure = [];
@@ -34,6 +39,14 @@ trait HasApiResponse
         return ["content" => $responseStructure, "statusCode" => $statusCode, "headers" => $headers];
     }
 
+    /**
+     * Parse and Handle Api Response
+     *
+     * @param array $data
+     * @param int $statusCode
+     * @param array $headers
+     * @return JsonResponse
+     */
     protected function apiResponse(array $data, int $statusCode = Response::HTTP_OK, array $headers = []): JsonResponse
     {
         $responseData = $this->parseGivenData($data, $statusCode, $headers);
@@ -44,15 +57,26 @@ trait HasApiResponse
         );
     }
 
+    /**
+     * Handle successful response with passed data
+     *
+     * @param array $data
+     * @return JsonResponse
+     */
     public function respondSuccess(array $data = []): JsonResponse
     {
-        \Log::info($data);
         return $this->apiResponse([
             'success' => true,
             'data' => $data
         ]);
     }
 
+    /**
+     * Handle item created and return data
+     *
+     * @param array $data
+     * @return JsonResponse
+     */
     protected function respondCreated(array $data): JsonResponse
     {
         return $this->apiResponse([
@@ -61,6 +85,15 @@ trait HasApiResponse
         ], Response::HTTP_CREATED);
     }
 
+    /**
+     * Respond with an error. Takes care of all errors.
+     *
+     * @param string|null $error
+     * @param int $statusCode
+     * @param array|null $errors
+     * @param array|null $trace
+     * @return JsonResponse
+     */
     protected function respondError(?string $error, int $statusCode = Response::HTTP_BAD_REQUEST, array $errors = null, array $trace = null): JsonResponse
     {
         return $this->apiResponse(

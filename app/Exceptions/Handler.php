@@ -45,6 +45,12 @@ class Handler extends ExceptionHandler
         });
     }
 
+    /**
+     * @param $request
+     * @param Throwable $e
+     * @return Response|JsonResponse|RedirectResponse|ResponseAlias
+     * @throws Throwable
+     */
     public function render($request, Throwable $e): Response|JsonResponse|RedirectResponse|ResponseAlias
     {
         if ($request->expectsJson()) {
@@ -110,6 +116,12 @@ class Handler extends ExceptionHandler
         return parent::render($request, $e);
     }
 
+    /**
+     * Parse Exception to return exception trace if environment is not production
+     *
+     * @param $exception
+     * @return array
+     */
     protected function parseException($exception): array {
 
         if (config('app.env') !== 'production') {

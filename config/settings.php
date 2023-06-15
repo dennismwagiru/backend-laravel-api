@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'per_page' => 30,
     'sources' => [
         'news-api' => [
             'api-key' => env('NEWS_API_PEY'),

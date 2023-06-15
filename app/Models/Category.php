@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * App\Models\Category
@@ -36,4 +37,16 @@ class Category extends Model
     protected $casts = [
         'sources' => 'array'
     ];
+
+    /**
+     * Category Articles
+     *
+     * @return BelongsToMany
+     */
+    public function articles(): BelongsToMany
+    {
+        return $this->belongsToMany(Article::class, 'article_categories',
+            'category_id', 'article_id'
+        );
+    }
 }

@@ -3,8 +3,10 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Notifications\PasswordResetSuccess;
 use Exception;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -13,7 +15,7 @@ use Tests\TestCase;
 
 class UserAuthTest extends TestCase
 {
-    use WithFaker;
+    use WithFaker, DatabaseTransactions;
 
     const ROUTE_REGISTER = 'auth.register';
     const ROUTE_LOGIN = 'auth.login';
@@ -204,7 +206,7 @@ class UserAuthTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonPath('error', __('errors.validation'))
-            ->assertJsonPath('errors.email.0', __('validation.enum', [
+            ->assertJsonPath('errors.email.0', __('validation.email', [
                 'attribute' => 'email'
             ]));
 
@@ -267,7 +269,7 @@ class UserAuthTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJsonPath('error', __('errors.validation'))
-            ->assertJsonPath('errors.email.0', __('validation.confirmed', [
+            ->assertJsonPath('errors.password.0', __('validation.confirmed', [
                 'attribute' => 'password'
             ]));
 
@@ -279,6 +281,38 @@ class UserAuthTest extends TestCase
             $user->password));
     }
 
+    public function test_user_auth_reset_password_invalid_token(): void
+    {
+        $user = User::factory()->create([
+            'password' => bcrypt(self::USER_ORIGINAL_PASSWORD)
+        ]);
+        $token = $this->faker->password;
+        $password = $this->faker->password;
+
+        $response = $this->post(route(self::ROUTE_RESET_PASSWORD, [
+            'token' => $token
+        ]), [
+            'token' => $token,
+            'email' => $user->email,
+            'password' => $password,
+            'password_confirmation' => $password
+        ]);
+
+        $response->assertStatus(400)
+            ->assertJsonPath('error', __('errors.validation'))
+            ->assertJsonPath('errors.email.0', __('passwords.token'));
+
+        $user->refresh();
+
+        $this->assertFalse(Hash::check($password, $user->password));
+
+        $this->assertTrue(Hash::check(self::USER_ORIGINAL_PASSWORD,
+            $user->password));
+    }
+
+    /**
+     * @throws Exception
+     */
     public function test_user_auth_reset_password(): void
     {
         $user = User::factory()->create([
@@ -304,6 +338,8 @@ class UserAuthTest extends TestCase
         $this->assertFalse(Hash::check(self::USER_ORIGINAL_PASSWORD, $user->password));
 
         $this->assertTrue(Hash::check($password, $user->password));
+
+        Notification::assertSentTo($user, PasswordResetSuccess::class);
     }
 
 }

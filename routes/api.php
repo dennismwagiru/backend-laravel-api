@@ -19,8 +19,13 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //});
 
+
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
     Route::post('register', [AuthController::class, 'register'])->name('register');
-    Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot-password');
+
+    Route::prefix('password')->name('password.')->group(function () {
+        Route::post('forgot', [AuthController::class, 'forgotPassword'])->name('forgot');
+        Route::post('reset', [AuthController::class, 'resetPassword'])->name('reset');
+    });
 });

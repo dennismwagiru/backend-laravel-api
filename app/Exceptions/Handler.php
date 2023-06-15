@@ -18,6 +18,7 @@ use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\Exception\TransportException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -54,7 +55,12 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $e): Response|JsonResponse|RedirectResponse|ResponseAlias
     {
         if ($request->expectsJson()) {
-            Log::info($e);
+            if ($e instanceof RouteNotFoundException) {
+                return $this->respondError(
+                    error: $e->getMessage(),
+                    statusCode: ResponseAlias::HTTP_NOT_FOUND
+                );
+            }
 
             if ($e instanceof MethodNotAllowedHttpException) {
                 return $this->respondError(

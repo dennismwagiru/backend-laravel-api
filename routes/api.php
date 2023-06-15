@@ -32,8 +32,8 @@ Route::prefix('auth')->name('auth.')->group(function () {
     });
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+//Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('authors', AuthorController::class)->only(['index', 'show']);
     Route::apiResource('articles', ArticleController::class)->only(['index', 'show']);
     Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
-});
+//});

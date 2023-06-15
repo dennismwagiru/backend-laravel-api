@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class UserAuthTest extends TestCase
 {
-    use WithFaker, DatabaseTransactions;
+    use WithFaker;
 
     const ROUTE_REGISTER = 'auth.register';
     const ROUTE_LOGIN = 'auth.login';

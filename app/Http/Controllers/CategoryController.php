@@ -17,7 +17,7 @@ class CategoryController extends Controller
      */
     public function index(): JsonResponse
     {
-        $categories = Category::query()
+        $categories = Category::filterBy(request()->all())
             ->paginate(request('per_page', config('settings.per_page')));
 
         $data = fractal($categories, new CategoryTransformer())

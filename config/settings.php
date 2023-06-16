@@ -1,11 +1,14 @@
 <?php
 
+use App\Domain\News\NewsApiService;
+
 return [
     'per_page' => 30,
     'sources' => [
         'news-api' => [
             'api-key' => env('NEWS_API_PEY'),
-            'label' => 'News Api'
+            'label' => 'News Api',
+            'service' => NewsApiService::class
         ],
         'the-guardian' => [
             'api-key' => env('THE_GUARDIAN_API_KEY'),

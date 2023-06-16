@@ -17,7 +17,7 @@ class ArticleController extends Controller
      */
     public function index(): JsonResponse
     {
-        $articles = Article::query()
+        $articles = Article::filterBY(request()->all())
             ->paginate(request('per_page', config('settings.per_page')));
 
         $data = fractal($articles, new ArticleTransformer())

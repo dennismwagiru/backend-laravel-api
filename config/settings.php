@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\News\NewsApiService;
+use App\Domain\News\NewYorkTimesApiService;
 use App\Domain\News\TheGuardianApiService;
 
 return [
@@ -22,7 +23,8 @@ return [
         ],
         'nwt' => [
             'api-key' => env('NWT_API_KEY'),
-            'label' => 'New York Times'
+            'label' => 'New York Times',
+            'service' => NewYorkTimesApiService::class
         ]
     ]
 ];

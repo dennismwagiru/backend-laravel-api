@@ -17,6 +17,9 @@ class ArticleController extends Controller
      */
     public function index(): JsonResponse
     {
+
+        request()->merge(auth('sanctum')->user()?->preferences);
+
         $articles = Article::filterBY(request()->all())
             ->paginate(request('per_page', config('settings.per_page')));
 

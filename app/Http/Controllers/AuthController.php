@@ -126,4 +126,29 @@ class AuthController extends Controller
             errors: ['email' => [__($status)]]
         );
     }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function updatePreferences(Request $request): JsonResponse {
+        $request->validate([
+            'source_ids' => 'nullable|array',
+            'source_ids.*' => 'exists|sources,id',
+            'author_ids' => 'nullable|array',
+            'author_ids.*' => 'exists|sources,id',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists|sources,id',
+        ]);
+
+        $user = auth('sanctum')->user();
+
+        $user->update([
+            'preferences' => json_encode($request->only(['source_ids', 'author_ids', 'category_ids']))
+        ]);
+
+        return $this->respondCreated(
+            fractal($user, UserTransformer::class)->toArray()
+        );
+    }
 }

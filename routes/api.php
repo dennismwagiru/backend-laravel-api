@@ -17,10 +17,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//    return $request->user();
-//});
-
 
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
@@ -32,8 +28,10 @@ Route::prefix('auth')->name('auth.')->group(function () {
     });
 });
 
-//Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('authors', AuthorController::class)->only(['index', 'show']);
-    Route::apiResource('articles', ArticleController::class)->only(['index', 'show']);
-    Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);
-//});
+Route::middleware('auth:sanctum')->group(function () {
+    Route::put('/user/preferences', [AuthController::class, 'updatePreferences']);
+});
+
+Route::apiResource('authors', AuthorController::class)->only(['index', 'show']);
+Route::apiResource('articles', ArticleController::class)->only(['index', 'show']);
+Route::apiResource('categories', CategoryController::class)->only(['index', 'show']);

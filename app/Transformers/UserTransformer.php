@@ -24,10 +24,11 @@ class UserTransformer extends TransformerAbstract
     protected array $availableIncludes = [
         //
     ];
-    
+
     /**
      * A Fractal transformer.
      *
+     * @param User $user
      * @return array
      */
     public function transform(User $user): array
@@ -36,6 +37,7 @@ class UserTransformer extends TransformerAbstract
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'preferences' => $user->preferences,
             'created_at' => $user->created_at,
             'updated_at' => $user->updated_at
         ];

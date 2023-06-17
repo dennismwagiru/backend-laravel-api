@@ -3,10 +3,20 @@
 namespace App\Domain\News;
 
 use App\Models\Article;
+use App\Models\Source;
 
 interface ApiService
 {
 
+    /**
+     * @param Source $source
+     * @return void
+     */
+    public function setSource(Source $source): void;
+
+    /**
+     * @return array
+     */
     public function getHeaders(): array;
 
     /**

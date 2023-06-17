@@ -12,20 +12,23 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * App\Models\Category
  *
  * @property int $id
- * @property array $sources
  * @property string $name
  * @property string|null $description
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|Category newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Category newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Category query()
- * @method static \Illuminate\Database\Eloquent\Builder|Category whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Category whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Category whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Category whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Category whereSources($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Category whereUpdatedAt($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Article> $articles
+ * @property-read int|null $articles_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Source> $sources
+ * @property-read int|null $sources_count
+ * @method static Builder|Category filterBy(array $filters)
+ * @method static Builder|Category newModelQuery()
+ * @method static Builder|Category newQuery()
+ * @method static Builder|Category query()
+ * @method static Builder|Category whereCreatedAt($value)
+ * @method static Builder|Category whereDescription($value)
+ * @method static Builder|Category whereId($value)
+ * @method static Builder|Category whereName($value)
+ * @method static Builder|Category whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Category extends Model
@@ -33,12 +36,18 @@ class Category extends Model
     use HasFactory;
 
     protected $fillable = [
-        'sources', 'name', 'description'
+        'name', 'description'
     ];
 
-    protected $casts = [
-        'sources' => 'array'
-    ];
+    /**
+     * @return BelongsToMany
+     */
+    public function sources(): BelongsToMany
+    {
+        return $this->belongsToMany(Source::class, 'source_categories',
+            'category_id', 'source_id'
+        );
+    }
 
     /**
      * Category Articles

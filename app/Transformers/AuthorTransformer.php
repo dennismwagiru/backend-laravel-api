@@ -3,6 +3,8 @@
 namespace App\Transformers;
 
 use App\Models\Author;
+use League\Fractal\Resource\Item;
+use League\Fractal\Resource\NullResource;
 use League\Fractal\TransformerAbstract;
 
 class AuthorTransformer extends TransformerAbstract
@@ -22,7 +24,7 @@ class AuthorTransformer extends TransformerAbstract
      * @var array
      */
     protected array $availableIncludes = [
-        //
+        'source',
     ];
 
     /**
@@ -40,5 +42,17 @@ class AuthorTransformer extends TransformerAbstract
             'description' => $author->description,
             'created_at' => $author->created_at
         ];
+    }
+
+    /**
+     * @param Author $author
+     * @return Item|NullResource
+     */
+    public function includeSource(Author $author): Item|NullResource
+    {
+        if (is_null($author->source)) {
+            return $this->null();
+        }
+        return $this->item($author->source, new SourceTransformer(), 'include');
     }
 }

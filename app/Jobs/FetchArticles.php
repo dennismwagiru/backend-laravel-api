@@ -3,12 +3,15 @@
 namespace App\Jobs;
 
 use App\Domain\News\ApiService;
+use App\Domain\News\NewsApiService;
+use App\Models\Source;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use ReflectionClass;
 
 class FetchArticles implements ShouldQueue
 {
@@ -27,15 +30,14 @@ class FetchArticles implements ShouldQueue
      */
     public function handle(): void
     {
-        $sources = array_filter(
-            config('settings.sources'),
-            fn($el) => array_key_exists('service', $el) && class_exists($el['service'])
+        Source::whereNotNull('service_class')->each(
+            function (Source $source) {
+                if (class_exists($source->service_class)) {
+                    $service = (new $source->service_class);
+                    $service->setSource($source);
+                    $service->articles();
+                }
+            }
         );
-
-        foreach ($sources as $source) {
-            $service = (new $source['service']);
-
-            print_r($service->articles());
-        }
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Transformers;
 
 use App\Models\Category;
+use League\Fractal\Resource\Collection;
 use League\Fractal\TransformerAbstract;
 
 class CategoryTransformer extends TransformerAbstract
@@ -22,7 +23,7 @@ class CategoryTransformer extends TransformerAbstract
      * @var array
      */
     protected array $availableIncludes = [
-        //
+        'articles', 'sources'
     ];
 
     /**
@@ -35,11 +36,28 @@ class CategoryTransformer extends TransformerAbstract
     {
         return [
             'id' => $category->id,
-            'sources' => $category->sources,
             'name' => $category->name,
             'description' => $category->description,
             'created_at' => $category->created_at,
             'updated_at' => $category->updated_at,
         ];
+    }
+
+    /**
+     * @param Category $category
+     * @return Collection
+     */
+    public function includeArticles(Category $category): Collection
+    {
+        return $this->collection($category->articles, new SourceTransformer(), 'include');
+    }
+
+    /**
+     * @param Category $category
+     * @return Collection
+     */
+    public function includeSources(Category $category): Collection
+    {
+        return $this->collection($category->sources, new SourceTransformer(), 'include');
     }
 }

@@ -2,9 +2,7 @@
 
 namespace App\Domain\News;
 
-use App\Models\Article;
-use App\Models\Author;
-use App\Models\Category;
+use App\Models\Source;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 
@@ -12,7 +10,15 @@ class NewsApiService implements ApiService
 {
 
     const BASE_URL = 'https://newsapi.org/v2/';
-    const KEY = 'news-api';
+    protected Source $source;
+
+    /**
+     * @param Source $source
+     */
+    public function setSource(Source $source): void
+    {
+        $this->source = $source;
+    }
 
     /**
      * @return string[]
@@ -76,16 +82,14 @@ class NewsApiService implements ApiService
     public function saveArticles(array $articles = [], string $category = null): void
     {
         foreach ($articles as $article) {
-            \Log::info($article);
             $author = null;
             if (!is_null($article['author'])) {
-                $author = Author::firstOrCreate([
+                $author = $this->source->authors()->firstOrCreate([
                     'name' => $article['author'],
-                    'source' => 'news-api'
                 ]);
             }
 
-            $saved = Article::updateOrCreate(
+            $saved = $this->source->articles()->updateOrCreate(
                 [
                     'author_id' => $author?->id,
                     'title' => $article['title'],
@@ -98,15 +102,11 @@ class NewsApiService implements ApiService
                 ]
             );
 
-            $cat = Category::where('name', $category)
-                ->first();
-            if (is_null($cat)) {
-                $cat = Category::create(['name' => $category, 'sources' => [self::KEY]]);
-            } elseif (!in_array(self::KEY, $cat->sources)) {
-                $cat->sources = [ ...$cat->sources, self::KEY];
+            if (!is_null($category)) {
+                \Log::info($category);
+                $cat = $this->source->categories()->firstOrCreate(['name' => $category]);
+                $saved->categories()->sync([$cat->id]);
             }
-
-            $saved->categories()->sync([$cat->id]);
         }
 
     }

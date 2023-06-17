@@ -91,8 +91,13 @@ class NewYorkTimesApiService implements ApiService
             }
 
             $imgUrl = null;
-            if (array_key_exists('multimedia', $article) && count($article['multimedia']) > 0)
+            if (
+                array_key_exists('multimedia', $article) &&
+                !is_null($article['multimedia']) &&
+                count($article['multimedia']) > 0
+            ) {
                 $imgUrl = $article['multimedia'][0]['url'];
+            }
 
             $saved = $this->source->articles()->updateOrCreate(
                 [

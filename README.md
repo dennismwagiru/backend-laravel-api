@@ -1,6 +1,6 @@
 News Aggregator API Developer Task
 ==============
-![CI Workflow](https://github.com/dennismwagiru/barnacle-news-api/actions/workflows/checks.yml/badge.svg "Workflow Badge")
+![CI Workflow](https://github.com/dennismwagiru/backend-laravel-api/actions/workflows/checks.yml/badge.svg "Workflow Badge")
 
 
 Writing a News Aggregator Api using Laravel, in PHP8.2.
@@ -30,7 +30,7 @@ Writing a News Aggregator Api using Laravel, in PHP8.2.
 * Follow these steps for the initial setup
     1. Clone the repository
         ````bash
-            git clone git@github.com:dennismwagiru/barnacle-news-api.git && cd barnacle-news-api
+            git clone git@github.com:dennismwagiru/backend-laravel-api.git && cd backend-laravel-api
         ````
     2. Build and start server
         ```bash

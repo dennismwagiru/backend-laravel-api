@@ -27,7 +27,7 @@ class NewsApiService implements ApiService
     {
         return [
             'Accept' => 'application/json',
-            'Authorization' => "Bearer " . config('settings.sources.news-api.api-key')
+            'Authorization' => "Bearer " . $this->source->api_key
         ];
     }
 
@@ -61,10 +61,10 @@ class NewsApiService implements ApiService
     public function articlesByCategory(string $category): void
     {
         $response = Http::withHeaders($this->getHeaders())
-            ->get(self::BASE_URL . 'top-headlines', 'language=en&category=' . $category);
+            ->get(self::BASE_URL . 'top-headlines', 'language=en&category=' . strtolower($category));
 
         if ($response->successful())
-            $this->saveArticles($response->json(['articles']), $category);
+            $this->saveArticles($response->json('articles'), $category);
     }
 
     /**
@@ -103,8 +103,7 @@ class NewsApiService implements ApiService
             );
 
             if (!is_null($category)) {
-                \Log::info($category);
-                $cat = $this->source->categories()->firstOrCreate(['name' => $category]);
+                $cat = $this->source->categories()->firstOrCreate(['name' => ucwords($category)]);
                 $saved->categories()->sync([$cat->id]);
             }
         }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Domain\News\NewsApiService;
+use App\Domain\News\TheGuardianApiService;
 
 return [
     'per_page' => 30,
@@ -12,7 +13,8 @@ return [
         ],
         'the-guardian' => [
             'api-key' => env('THE_GUARDIAN_API_KEY'),
-            'label' => 'The Guardian'
+            'label' => 'The Guardian',
+            'service' => TheGuardianApiService::class
         ],
         'news-cred' => [
             'api-key' => env('NEWS_CRED_API_KEY'),

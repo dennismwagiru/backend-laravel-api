@@ -32,6 +32,7 @@ class FetchArticles implements ShouldQueue
     {
         Source::whereNotNull('service_class')->each(
             function (Source $source) {
+                \Log::info($source);
                 if (class_exists($source->service_class)) {
                     $service = (new $source->service_class);
                     $service->setSource($source);
